@@ -5,8 +5,6 @@ const port = process.env.PORT || 3000
 const { UpdateNginxWithDeploy } = require('./models/NginxUpdate');
 
 app.get('/', (req, res) => {
-
-    UpdateNginxWithDeploy("hmm", 8990)
     res.send('Hello World!')
 
 })
