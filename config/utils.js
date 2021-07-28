@@ -20,4 +20,6 @@ function RunScript(command, args) {
 
 }
 
+// RunScript('python',['./test.py'])
+
 module.exports = { RunScript }

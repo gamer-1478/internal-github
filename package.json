@@ -17,8 +17,10 @@
   },
   "homepage": "https://github.com/gamer-12748/internal-github#readme",
   "dependencies": {
+    "dotenv": "^10.0.0",
     "ejs": "^3.1.6",
     "express": "^4.17.1",
+    "line-reader": "^0.4.0",
     "nginx-conf": "^2.0.0"
   }
 }

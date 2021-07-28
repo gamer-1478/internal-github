@@ -4,9 +4,11 @@ const port = process.env.PORT || 3000
 const {RunScript} = require('./config/utils')
 const { UpdateNginxWithDeploy } = require('./models/NginxUpdate');
 
+const {AddGeoliteRepoWithUser} = require('./models/GeoliteUpdate')
+AddGeoliteRepoWithUser('hmm', 'hmm',[], './test/test.gitolite.conf')
+console.log('node version', process.version)
 app.get('/', (req, res) => {
     res.send('Hello World!')
-    RunScript('python',['./test.py'])
 })
 
 app.listen(port, () => {
