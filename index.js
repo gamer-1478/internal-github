@@ -4,13 +4,13 @@ const port = process.env.PORT || 3000
 const { RunScript } = require('./config/utils')
 const { UpdateNginxWithDeploy } = require('./models/NginxUpdate');
 
-const { RemoveGitoliteUser } = require('./models/GitoliteUpdate')
+const { RemoveGitoliteRepo } = require('./models/GitoliteUpdate')
 
 
 console.log('node version', process.version)
 app.get('/', async (req, res) => {
     res.send('Hello World!')
-    let resp1 = RemoveGitoliteUser('hmm', './test/keydirr')
+    let resp1 = await RemoveGitoliteRepo('testingThisBAdSite','./test/test.gitolite.conf')
     console.log(resp1)
 })
 
