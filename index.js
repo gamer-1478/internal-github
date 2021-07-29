@@ -4,14 +4,14 @@ const port = process.env.PORT || 3000
 const { RunScript } = require('./config/utils')
 const { UpdateNginxWithDeploy } = require('./models/NginxUpdate');
 
-const { AddUsersToExistingGitoliteRepo } = require('./models/GitoliteUpdate')
+const { RemoveGitoliteUser } = require('./models/GitoliteUpdate')
 
 
 console.log('node version', process.version)
 app.get('/', async (req, res) => {
     res.send('Hello World!')
-    let resp = await AddUsersToExistingGitoliteRepo([{ username: 'fuckme1', perms: 'own' }, { username: 'ohyeah1', perms: 'r' }], 'testingThisBAdSite', './test/test.gitolite.conf')
-    console.log(resp)
+    let resp1 = RemoveGitoliteUser('hmm', './test/keydirr')
+    console.log(resp1)
 })
 
 app.listen(port, () => {

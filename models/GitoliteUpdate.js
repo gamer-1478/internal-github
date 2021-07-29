@@ -8,10 +8,9 @@ let locked = false
  *THIS FILE IS SO BUGGY IS THAT IT WILL JUST GIVE FALSE OR NULL OR NONE WITHOUT CONSISTENCY. GAMER-1478, ME SHOULD MAKE BETTER CODE,*
  *BUT I PROLLY WONT, EH*/
 
-
-//users is an list of objects, where each object has a username and perms, eg [{username:alice, perms:''},{username:'bob', perms:''}], accepted perms, 'own', 'r', 'rw', 'ad'
-//takes in who is the owner, They get RW+ perm and the reponame
-//const GitoliteFile = require(GitoliteConfLocation)
+/*users is an list of objects, where each object has a username and perms, eg [{username:alice, perms:''},{username:'bob', perms:''}], accepted perms, 'own', 'r', 'rw', 'ad'
+takes in who is the owner, They get RW+ perm and the reponame
+const GitoliteFile = require(GitoliteConfLocation)*/
 async function AddGitoliteRepoWithUser(reponame, owner, users, GitoliteConfLocation) {
     let CheckIfRepoAlreadyExists = await CheckIfFileContainsRepo(reponame, GitoliteConfLocation);
     if (users.length != 0 && await GitoliteExists(GitoliteConfLocation) == true) {
@@ -87,27 +86,27 @@ async function ChangeUserPermsInGitoliteRepo(users, reponame, GitoliteConfLocati
     }
 }
 
+//remove user in repo
 function RemoveUserInGitoliteRepo(reponame, user, GitoliteConfLocation) {
-    //remove user in repo
-
 }
 
+//remove the whole repo
 function RemoveGitoliteRepo(repo, GitoliteConfLocation) {
-    //remove the whole repo
-
 }
 
+//add a new user to giolite directory
 function AddGitoliteUser(username, key, GitoliteKeydirLocation) {
-    // add a new user to giolite directory
-
+    fs.writeFileSync(GitoliteKeydirLocation+'/'+username+'.pub', key.trim())
+    return true
 }
 
+//remove a Gitolite user
 function RemoveGitoliteUser(username, GitoliteKeydirLocation) {
-    // remove a Gitolite user
-
+    fs.unlinkSync(GitoliteKeydirLocation+'/'+username+'.pub')
+    return true
 }
 
-// *************************************** INTERNAL FUNCTIONS *************************************************************************************************//
+/*************************************************************************************** INTERNAL FUNCTIONS *************************************************************************************************/
 // If gitolite File exists
 async function GitoliteExists(GitoliteConfLocation) {
     // See if the file exists
@@ -306,4 +305,6 @@ var CheckIfFileContainsRepoPromiseWithLineNumber = function (filelocation, repon
     })
 }
 
+
+//export models
 module.exports = { AddGitoliteRepoWithUser, RemoveGitoliteRepo, AddGitoliteUser, AddUsersToExistingGitoliteRepo, RemoveGitoliteUser, RemoveUserInGitoliteRepo, ChangeUserPermsInGitoliteRepo }
