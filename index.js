@@ -1,14 +1,17 @@
 const express = require('express')
 const app = express()
 const port = process.env.PORT || 3000
-const {RunScript} = require('./config/utils')
+const { RunScript } = require('./config/utils')
 const { UpdateNginxWithDeploy } = require('./models/NginxUpdate');
 
-const {AddGeoliteRepoWithUser} = require('./models/GeoliteUpdate')
-AddGeoliteRepoWithUser('hmm', 'hmm',[], './test/test.gitolite.conf')
+const { AddUsersToExistingGitoliteRepo } = require('./models/GitoliteUpdate')
+
+
 console.log('node version', process.version)
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
     res.send('Hello World!')
+    let resp = await AddUsersToExistingGitoliteRepo([{ username: 'fuckme1', perms: 'ad' }, { username: 'ohyeah1', perms: 'r' }], 'testingThisBAdSite', './test/test.gitolite.conf')
+    //console.log(resp)
 })
 
 app.listen(port, () => {
