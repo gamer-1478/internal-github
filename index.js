@@ -10,8 +10,8 @@ const { AddUsersToExistingGitoliteRepo } = require('./models/GitoliteUpdate')
 console.log('node version', process.version)
 app.get('/', async (req, res) => {
     res.send('Hello World!')
-    let resp = await AddUsersToExistingGitoliteRepo([{ username: 'fuckme1', perms: 'ad' }, { username: 'ohyeah1', perms: 'r' }], 'testingThisBAdSite', './test/test.gitolite.conf')
-    //console.log(resp)
+    let resp = await AddUsersToExistingGitoliteRepo([{ username: 'fuckme1', perms: 'own' }, { username: 'ohyeah1', perms: 'r' }], 'testingThisBAdSite', './test/test.gitolite.conf')
+    console.log(resp)
 })
 
 app.listen(port, () => {

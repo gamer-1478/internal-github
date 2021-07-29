@@ -1,16 +1,20 @@
 var fs = require('fs');
 var lineReader = require('line-reader');
 const insertLine = require('insert-line')
+let locked = false
 
-/******THIS FILE DOES NOT SANATISE, IT EXPECTS A ALREADY SANITISED REPONAME, USERNAME, AMONG OTHERS.******/
+/*THIS FILE DOES NOT SANATISE, IT EXPECTS A ALREADY SANITISED REPONAME, USERNAME, AMONG OTHERS. THIS IS A VERY BUGGY FILE,*
+ *PLEASE PASS IN CORRECT FILE LOCATIONS TO SAY THE LEAST, WITHOUT CORRECT CONF LOCATION YOU MAY NOT EVEN GET A RESPONSE,*
+ *THIS FILE IS SO BUGGY IS THAT IT WILL JUST GIVE FALSE OR NULL OR NONE WITHOUT CONSISTENCY. GAMER-1478, ME SHOULD MAKE BETTER CODE,*
+ *BUT I PROLLY WONT, EH*/
 
 
-// users is an list of objects, where each object has a username and perms, eg [{username:alice, perms:''},{username:'bob', perms:''}], accepted perms, 'own', 'r', 'rw', 'ad'
-// takes in who is the owner, They get RW+ perm and the reponame
+//users is an list of objects, where each object has a username and perms, eg [{username:alice, perms:''},{username:'bob', perms:''}], accepted perms, 'own', 'r', 'rw', 'ad'
+//takes in who is the owner, They get RW+ perm and the reponame
 //const GitoliteFile = require(GitoliteConfLocation)
 async function AddGitoliteRepoWithUser(reponame, owner, users, GitoliteConfLocation) {
     let CheckIfRepoAlreadyExists = await CheckIfFileContainsRepo(reponame, GitoliteConfLocation);
-    if (users.length != 0) {
+    if (users.length != 0 && await GitoliteExists(GitoliteConfLocation) == true) {
         let resp = await ParseUsers(users);
         let appendString = `\n\nrepo ${reponame}\n    RW+ = ${owner}\n${resp}`
         if (CheckIfRepoAlreadyExists == false && appendString.length != 0) {
@@ -36,13 +40,11 @@ async function AddGitoliteRepoWithUser(reponame, owner, users, GitoliteConfLocat
     }
 }
 
-let locked = false
-
 // takes in users which is an list of objects, where each object has a username and perms, eg [{username:alice, perms:''},{username:'bob', perms:''}], accepted perms, 'owner', 'read', 'readwrite 
 // and reponame, to Add to ExistingGitoLiteRepo
 async function AddUsersToExistingGitoliteRepo(users, reponame, GitoliteConfLocation) {
     let CheckIfRepoAlreadyExists = await CheckIfRepoAlreadyExistsWithLineNumber(reponame, GitoliteConfLocation);
-    if (Number.isInteger(CheckIfRepoAlreadyExists) === true) {
+    if (Number.isInteger(CheckIfRepoAlreadyExists) === true && await GitoliteExists(GitoliteConfLocation) === true) {
         if (users.length != 0) {
             for (const element of users) {
                 if (locked === false) {
@@ -57,15 +59,32 @@ async function AddUsersToExistingGitoliteRepo(users, reponame, GitoliteConfLocat
         else {
             return false
         }
-    }
-    else {
+    } else {
         return false
     }
 }
 
 //takes in reponame and username, Changes user given's Perms in repo
-function ChangeUserPermsInGitoliteRepo(reponame, username, GitoliteConfLocation) {
-
+async function ChangeUserPermsInGitoliteRepo(users, reponame, GitoliteConfLocation) {
+    let CheckIfRepoAlreadyExists = await CheckIfRepoAlreadyExistsWithLineNumber(reponame, GitoliteConfLocation);
+    if (Number.isInteger(CheckIfRepoAlreadyExists) === true && await GitoliteExists(GitoliteConfLocation) === true) {
+        if (users.length != 0) {
+            for (const element of users) {
+                if (locked === false) {
+                    locked = true
+                    let resp = await CheckIfUserAlreadyExistsInRepo(reponame, CheckIfRepoAlreadyExists, element.username, element.perms, GitoliteConfLocation)
+                    console.log("CheckIfUserAlreadyExistsInRepo", resp)
+                    locked = false
+                }
+            }
+            return true
+        }
+        else {
+            return false
+        }
+    } else {
+        return false
+    }
 }
 
 function RemoveUserInGitoliteRepo(reponame, user, GitoliteConfLocation) {
@@ -89,12 +108,18 @@ function RemoveGitoliteUser(username, GitoliteKeydirLocation) {
 }
 
 // *************************************** INTERNAL FUNCTIONS *************************************************************************************************//
+// If gitolite File exists
+async function GitoliteExists(GitoliteConfLocation) {
+    // See if the file exists
+    return await fs.existsSync(GitoliteConfLocation)
+}
 
 //parses users
 async function ParseUsers(users) {
 
     let StringToReturn = ''
     await users.forEach((element, index) => {
+        element.perms = element.perms.replace("own", "RW+")
         element.perms = element.perms.replace("ad", "RW+")
         element.perms = element.perms.replace("rw", "RW")
         element.perms = element.perms.replace("r", "R")
@@ -158,7 +183,13 @@ async function CheckIfUserAlreadyExistsInRepo(reponame, repoline, username, perm
                     return 'found the user already in repo, with same perms, exiting'
                 }
                 else {
-                    //call Change Existing User Function which is still in making
+                    var data = fs.readFileSync(GitoliteConfLocation).toString().split("\n");
+                    data.splice(lineNumberOfUser - 1, 1);
+                    data.splice(lineNumberOfUser - 1, 0, await ParseUsers([{ username: username, perms: perms }]));
+                    var text = data.join("\n");
+                    fs.writeFile(GitoliteConfLocation, text, function (err) {
+                        if (err) return console.log(err);
+                    });
                     return 'found the user already in repo, changing his perms'
                 }
             }
