@@ -1,17 +1,14 @@
 const express = require('express')
 const app = express()
 const port = process.env.PORT || 3000
-const { RunScript } = require('./config/utils')
-const { UpdateNginxWithDeploy } = require('./models/NginxUpdate');
+const path = require('path')
+app.use('/', express.static(path.join(__dirname, 'public')))
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.set('view engine', 'ejs')
 
-const { RemoveGitoliteRepo } = require('./models/GitoliteUpdate')
-
-
-console.log('node version', process.version)
 app.get('/', async (req, res) => {
-    res.send('Hello World!')
-    let resp1 = await RemoveGitoliteRepo('testingThisBAdSite','./test/test.gitolite.conf')
-    console.log(resp1)
+    res.render('index.ejs')
 })
 
 app.listen(port, () => {

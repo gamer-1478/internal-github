@@ -472,6 +472,5 @@ var CheckIfFileContainsRepoPromiseWithLineNumber = function (filelocation, repon
     })
 }
 
-
 //export models
 module.exports = { AddGitoliteRepoWithUser, RemoveGitoliteRepo, AddGitoliteUser, AddUsersToExistingGitoliteRepo, RemoveGitoliteUser, RemoveUserInGitoliteRepo, ChangeUserPermsInGitoliteRepo }
