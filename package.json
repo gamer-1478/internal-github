@@ -4,7 +4,7 @@
   "description": "A github like site with inbuilt heroku to deploy projects and browse code",
   "main": "index.js",
   "scripts": {
-    "test": "node index.js",
+    "test": "nodemon start",
     "start": "node index.js"
   },
   "repository": {
