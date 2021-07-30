@@ -1,4 +1,13 @@
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+}
+
 .login-section {
+    margin-top: 20px;
     border: 1px solid #ebedef;
     display: flex;
     justify-content: center;
@@ -54,9 +63,15 @@
     box-sizing: border-box;
 }
 
-.login-container {
+.index-logo {
+    height: auto;
+    width: auto;
     display: flex;
     justify-content: center;
-    align-items: center;
-    height: 100vh;
+    flex-direction: row;
+}
+
+.index-logo img {
+    height: 200px;
+    width: 200px;
 }
