@@ -11,7 +11,7 @@ app.set('view engine', 'ejs')
 app.use(expressLayouts);
 
 app.get('/', async (req, res) => {
-    res.render('index.ejs')
+    res.render('index.ejs', {title:"index", footer:"this is some footer", header:"This is working fine"})
 })
 
 app.listen(port, () => {
