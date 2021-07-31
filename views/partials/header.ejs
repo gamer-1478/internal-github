@@ -1,20 +1,18 @@
-<div class="index-header-container" id="index-header-container">
-    <div class="index-header-logo">
-        <img src="/assets/logo.png" />
+<div class="index-header-section">
+    <img class="index-header-logo" src="/assets/logo.png" />
+    <div class="index-header-container" id="index-header-container">
+        <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="/documentation">Documentation</a></li>
+            <li><a href="/features">Why DisPlicare?</a></li>
+            <li><a href="/pricing">Pricing</a></li>
+            <li class="float-right-mobile-header"><a href="/login">SignIn</a> </li>
+            <button class="index-header-signup-button float-right-mobile-header">SignUp</button>
+            <li class="visible-mobile-header"><a href="/signup">SignUp</a></li>
+        </ul>
     </div>
-    <div class="index-sidebar-button" id="index-sidebar-button">
-        <img onclick="openSidebar()" style="width: 20px; height:20px;"
-            src="https://cdn0.iconfinder.com/data/icons/heroicons-ui/24/icon-menu-512.png" />
-    </div>
-    <ul>
-        <li><a href="#home">Home</a></li>
-        <li><a href="/documentation">Documentation</a></li>
-        <li><a href="/features">Why DisPlicare?</a></li>
-        <li><a href="/pricing">Pricing</a></li>
-        <li class="float-right-mobile-header"><a href="/login">SignIn</a> </li>
-        <button class="index-header-signup-button float-right-mobile-header">SignUp</button>
-        <li class="visible-mobile-header"><a href="/signup">SignUp</a></li>
-    </ul>
+    <img class="index-sidebar-button" onclick="openSidebar()"
+        src="https://cdn0.iconfinder.com/data/icons/heroicons-ui/24/icon-menu-512.png" />
 </div>
 <style>
     .index-header-signup-button {
@@ -40,23 +38,25 @@
 
     .index-header-logo {
         display: block;
-    }
-
-    .index-header-logo img {
-        padding-left: 1vw;
-        padding-top: 2.5vh;
+        float: left;
+        padding-left: 3vw;
+        margin-top: 2.5vh;
         height: 40px !important;
         width: 40px !important;
     }
 
     .index-header-container {
-        width: 90%;
-        display: flex;
-        flex-direction: row;
+        width: 90vw;
+        display: inline-block;
         position: absolute;
         left: 50%;
         transform: translateX(-50%);
-        background-color: #fff;
+    }
+
+    .index-header-section {
+        display: inline-block;
+        position: absolute;
+        width: 98vw;
     }
 
     .index-header-container ul {
@@ -102,6 +102,10 @@
 
     .index-sidebar-button {
         visibility: hidden;
+        float: right;
+        padding-top: 20px;
+        padding-right: 20px;
+        height: 30px;
     }
 
     .index-header-signup-button:hover {
@@ -111,5 +115,42 @@
         transition: 0.2s;
     }
 
-    @media screen and (max-width: 950px) {}
+    @media screen and (max-width: 950px) {
+        .index-sidebar-button {
+            visibility: visible;
+            direction: rtl;
+        }
+
+        .index-header-container ul {
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            margin: 0;
+        }
+
+        .index-header-container {
+            display: none;
+            flex-direction: column;
+            height: 100vh;
+            background-color: #fff;
+            margin-top: 7vh;
+            width: 95vw;
+            background-position: right;
+        }
+    }
 </style>
+
+<script>
+    let locked = false;
+
+    function openSidebar() {
+        if (locked === false) {
+            window.document.getElementById('index-header-container').style.display = 'flex';
+            locked = true
+        }
+        else{
+            window.document.getElementById('index-header-container').style.display = 'none';
+            locked = false
+        }
+    }
+</script>
