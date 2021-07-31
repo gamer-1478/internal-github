@@ -11,9 +11,12 @@ app.set('view engine', 'ejs')
 app.use(expressLayouts);
 
 app.get('/', async (req, res) => {
-    res.render('index.ejs', {title:"index", footer:"this is some footer", header:"This is working fine"})
+    res.render('signin.ejs', {title:"index"})
 })
 
+app.get('/signup', async(req, res)=>{
+    res.render('signup.ejs', {title:"index"})
+})
 app.listen(port, () => {
     console.log(`app most likely listening at http://localhost:${port}, If not you are in production.`)
 })

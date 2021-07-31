@@ -15,6 +15,7 @@
         src="https://cdn0.iconfinder.com/data/icons/heroicons-ui/24/icon-menu-512.png" />
 </div>
 <style>
+    @media screen and (max-width: 8000px) {
     .index-header-signup-button {
         border: none;
         background: none;
@@ -114,7 +115,7 @@
         color: #fff;
         transition: 0.2s;
     }
-
+    }
     @media screen and (max-width: 950px) {
         .index-sidebar-button {
             visibility: visible;
@@ -147,8 +148,7 @@
         if (locked === false) {
             window.document.getElementById('index-header-container').style.display = 'flex';
             locked = true
-        }
-        else{
+        } else {
             window.document.getElementById('index-header-container').style.display = 'none';
             locked = false
         }
