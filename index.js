@@ -2,16 +2,6 @@ if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config()
 }
 
-let users = [
-    {
-        id: '1627826337945',
-        name: 'fullname',
-        username: 'fullname',
-        email: 'fullname',
-        password: '$2b$10$EXq0gPhY1ZOSzqkX/PsTheJ502/FMiZl2sI.mrm0fGEP0ca5Ja/Wu'
-    }
-];
-
 const admin = require('./firebase')
 const db = admin.firestore();
 const express = require('express')
@@ -26,9 +16,11 @@ var session = require('cookie-session');
 
 const methodOverride = require('method-override')
 
-const initializePassport = require('./config/passport-config')
+const initializePassport = require('./config/passport-config');
 
 const userCollection = db.collection('users');
+const repoCollection = db.collection('repos');
+
 
 app.use('/', express.static(path.join(__dirname, 'public')))
 app.use(express.json());
@@ -115,8 +107,33 @@ app.get('/new-app', checkAuthenticated, (req, res) => {
     })
 })
 
-app.post('/new-app', checkAuthenticated, (req, res) => {
-
+app.post('/new-app', checkAuthenticated, async (req, res) => {
+    if (req.body.hasOwnProperty('appname') && req.body.appname != 0) {
+        let repo = {
+            "reponame": req.body.appname || '',
+            "port": 0,
+            "owner": req.user.username,
+            "access": [req.user.username],
+            "env-var": "",
+            "deploy_error": "",
+            "deploying": true,
+            "deploy-completed": false,
+            "last-deploy": Date.now(),
+            "date-created": Date.now()
+        }
+        try {
+            await repoCollection.doc(repo.reponame).set(repo)
+            let currentRepo = await userCollection.doc(req.user.username).get()
+            currentRepo = currentRepo.data()
+            currentRepo.repo = currentRepo.repo.push({ reponame: repo.reponame })
+            await userCollection.doc(req.user.username).set(currentRepo)
+            res.send({ "message": "App Created Successfully, Please Wait for full deployment Which Has been Scheduled. Refresh to see status change." })
+        }
+        catch (e) {
+            console.log(e)
+            res.status(404).send({ message: e })
+        }
+    }
 })
 
 app.get('/deploys', checkAuthenticated, (req, res) => {
@@ -127,7 +144,7 @@ app.get('/deploys', checkAuthenticated, (req, res) => {
     })
 })
 
-app.get('/:username?/:reponame?/:backlink?', checkAuthenticated, (req, res) => {
+app.get('/:username?/:reponame?/:backlink?', checkAuthenticated, async (req, res) => {
     let backlink = req.params.backlink || ''
     let reponame = req.params.reponame || ''
     let username = req.params.username || ''
@@ -138,40 +155,79 @@ app.get('/:username?/:reponame?/:backlink?', checkAuthenticated, (req, res) => {
     let settings = false;
     let deploys = false;
 
-    if (reponame.length != 0) {
-        switch (backlink) {
-            case 'issues':
-                issues = true
-                break;
-            case 'pull-requests':
-                pullRequests = true
-                break;
-            case 'settings':
-                settings = true
-                break;
-            case 'deploys':
-                deploys = true
-                break;
-            case '':
-                code = true
-                break;
-            default:
-                res.redirect('/')
-        }
-        res.render('repository.ejs', {
-            loggedIn: true,
-            title: "Dashboard",
-            repo: { reponame: reponame },
-            username: username,
-            screen: { code: code, issues: issues, 'pull-requests': pullRequests, settings: settings, deploys: deploys }
+    async function checkRepoNameWithLocalRepo(fn_reponame) {
+        let Ranout = await req.user.repo.every(element => {
+            if (element.hasOwnProperty('reponame') && element.reponame == fn_reponame) {
+                return true;
+            }
         })
+        if (await Ranout != true) {
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
+
+    if (reponame.length != 0) {
+        if (reponame == 'profile') {
+            res.render('profile.ejs', {
+                loggedIn: true,
+                title: "Profile",
+                username: username
+            })
+        }
+        else {
+
+            console.log(req.user.repo, await checkRepoNameWithLocalRepo(reponame))
+            if (await checkRepoNameWithLocalRepo(reponame) == true) {
+                let repo_details = await repoCollection.doc(req.user.repo).get()
+                repo_details = repo_details.data()
+                switch (backlink) {
+                    case 'issues':
+                        issues = true
+                        break;
+                    case 'pull-requests':
+                        pullRequests = true
+                        break;
+                    case 'settings':
+                        settings = true
+                        break;
+                    case 'deploys':
+                        deploys = true
+                        break;
+                    case '':
+                        code = true
+                        break;
+                    default:
+                        res.redirect('/')
+                }
+                res.render('repository.ejs', {
+                    loggedIn: true,
+                    title: "Dashboard",
+                    repo: {
+                        reponame: repo_details.reponame,
+                        deploying: repo_details.deploying,
+                        deploy_completed: repo_details['deploy-completed'],
+                        deploy_error: repo_details['deploy_error'],
+                        env: repo_details['env-var'],
+                    },
+                    username: username,
+                    screen: { code: code, issues: issues, 'pull-requests': pullRequests, settings: settings, deploys: deploys }
+                })
+            }
+            else {
+                res.send("Not found the repo")
+            }
+
+        }
     }
     else if (username.length != 0 && username == req.user.username) {
         res.render('dashboard.ejs', {
             loggedIn: true,
             title: "Dashboard",
             username: username,
-            repo: [{ reponame: 'test1' }, { reponame: 'test2' }]
+            repo: req.user.repo
         })
     }
     else {
@@ -205,7 +261,8 @@ app.post('/register', checkNotAuthenticated, async (req, res) => {
                         name: req.body.name,
                         username: req.body.username,
                         email: req.body.email,
-                        password: hashedPassword
+                        password: hashedPassword,
+                        repo: []
                     })
                     res.send({ message: "Registeration Successful" })
                 }
@@ -213,7 +270,6 @@ app.post('/register', checkNotAuthenticated, async (req, res) => {
                     res.send({ message: "account with same username already exists, please take another username" })
                 }
             }
-
             else {
                 res.send({ message: "account with same email already exists, please enter another email" })
             }

@@ -2,7 +2,7 @@
     <div class="newapp-container">
         <h1>Create A New App</h1>
         <div class="newapp-container-form">
-            <form class="newapp-form" onsubmit="event.preventDefault(); indexSignup()">
+            <form class="newapp-form" onsubmit="event.preventDefault(); newApp()">
                 <label for="newapp-index-appname">App Name</label>
                 <input type="text" id="newapp-index-appname"><br><br>
                 <input type="submit" value="Create App" class="newapp-index-submit" id="newapp-index-submit">
@@ -19,3 +19,10 @@
         justify-content: center;
     }
 </style>
+
+<script>
+    function newApp() {
+        let reponame = document.getElementById('newapp-index-appname').value
+        if(reponame == ''){}
+    }
+</script>
