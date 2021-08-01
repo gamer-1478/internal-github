@@ -1,0 +1,76 @@
+<div class="dashboard-section-toplevel">
+    <div class="dashboard-section">
+        <hr>
+        <div class="dashboard-container">
+            <div class="dashboard-title">
+                <h1>Dashboard</h1>
+            </div>
+            <div class="dashboard-new-app">
+                <button class="dashboard-new-app-button" onclick="redirectTo('new-app')">Create New App</button>
+            </div>
+        </div>
+        <div class="dashboard-repositories">
+            <% if (typeof repo != 'undefined' && repo.length != 0){ %>
+            <% repo.forEach((element, index)=>{ %>
+            <a href=<%= '/'+username+'/'+element.reponame %>><%= element.reponame %></a>
+            <% })} %>
+        </div>
+    </div>
+</div>
+<script>
+    function redirectTo(href) {
+        window.location.href = window.location.origin + '/' + href
+    }
+</script>
+
+<style>
+    .dashboard-new-app-button {
+        border: none;
+        background: none;
+        font-size: 20px;
+        font-family: 'Times New Roman', Times, serif;
+        border-spacing: 10px;
+        border: 1px solid #000;
+        display: inline-block;
+        border-radius: 5px;
+        padding: 10px;
+        margin-top: 10px;
+
+    }
+
+    .dashboard-new-app-button:hover {
+        background-color: aqua;
+    }
+
+    .dashboard-section-toplevel {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .dashboard-repositories {
+        display: flex;
+        flex-direction: column;
+        width: 70%;
+        justify-content: center;
+    }
+
+    .dashboard-repositories a {
+        line-height: 50px;
+        font-size: 25px;
+    }
+
+    .dashboard-section {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .dashboard-container {
+        padding-right: 50vw;
+        width: 90%;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+</style>

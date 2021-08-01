@@ -1,0 +1,21 @@
+<div class="newapp-section">
+    <div class="newapp-container">
+        <h1>Create A New App</h1>
+        <div class="newapp-container-form">
+            <form class="newapp-form" onsubmit="event.preventDefault(); indexSignup()">
+                <label for="newapp-index-appname">App Name</label>
+                <input type="text" id="newapp-index-appname"><br><br>
+                <input type="submit" value="Create App" class="newapp-index-submit" id="newapp-index-submit">
+            </form>
+        </div>
+        <h4 id="error"></h4>
+    </div>
+</div>
+
+<style>
+    .newapp-section {
+        width: 90%;
+        display: flex;
+        justify-content: center;
+    }
+</style>

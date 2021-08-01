@@ -1,0 +1,8 @@
+{
+    "reponame":"test",
+    "port":"3000",
+    "owner":"test",
+    "env-var":"Your Env, Values seperated by comma, like \nSECRETKEY=jbawfbjabfjbawobfoawb, \nPASSPORTKEY=jbawfbjabfjbawobfoawb",
+    "deploying":true,
+    "last-deploy":352352353252
+}

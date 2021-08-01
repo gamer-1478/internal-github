@@ -77,7 +77,6 @@
         height: 130px;
         width: 130px;
     }
-
 </style>
 <div class="login-container">
     <div>
@@ -87,14 +86,21 @@
         <h1>Sign In To DisPlicare</h1>
     </div>
     <div class="login-section">
-        <form class="login-form">
-            <label for="index-email">Email Address</label>
-            <input type="text" id="index-email" name="index-email" class="index-email"><br><br>
-            <label for="index-password">Password </label>
+        <form class="login-form" action="/login" method="POST">
+            <label for="email">Email Address</label>
+            <input type="text" id="email" name="email" class="email"><br><br>
+            <label for="password">Password </label>
             <a class="label-link position-absolute top-0 right-0" tabindex="0" href="/password_reset">Forgot
                 password?</a>
-            <input type="password" id="index-password" name="index-password" class="index-password"><br><br>
+            <input type="password" id="password" name="password" class="password"><br><br>
             <input type="submit" value="Sign In" class="index-submit" id="index-submit">
         </form>
     </div>
+    <% if(messages.error) { %>
+    <h4><%= messages.error %></h4>
+    <% } %> 
 </div>
+
+
+<script>
+</script>

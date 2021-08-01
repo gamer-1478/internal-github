@@ -1,0 +1,105 @@
+<div>
+    <div>
+        <div class="heading-reponame-dashboard">
+            <% if (repo.hasOwnProperty('reponame')) { %>
+            <h1><%= username + '/' + repo.reponame %> </h1>
+            <% } %>
+        </div>
+        <div>
+            <nav class="dashboard-repo-navbar">
+                <ul>
+                    <li><a href="<%= '/'+username+'/'+repo.reponame %>">Code</a></li>
+                    <li><a href="<%= '/'+username+'/'+repo.reponame+'/issues' %>">Issues</a></li>
+                    <li><a href="<%= '/'+username+'/'+repo.reponame+'/pull-requests' %>">Pull Requests</a></li>
+                    <li><a href="<%= '/'+username+'/'+repo.reponame+'/settings' %>">Settings</a></li>
+                    <li><a href="<%= '/'+username+'/'+repo.reponame+'/deploys' %>">Deploys</a></li>
+
+                </ul>
+            </nav>
+            <hr />
+        </div>
+        <% if ( typeof screen != 'undefined') { %>
+        <% if (screen.code == true) {%>
+        <div class="repo-code">
+            <h1>Code Viewing And Editing In Development</h1>
+            <p>MeanWhile add remote using 'git add remote displicare <%= repo.reponame %>@git.displicare.us' </p>
+            <p>add the code using 'git add .'</p>
+            <p>Push the code using 'git push displicare main' and commit the code before that using 'git commit -m "first commit"'</p>
+            <p>Please note the displicare service will only deploy whatever is on main repo. All other repo's can be pushed, but won't be deployed.</p>
+            <p>If you are unable to perform push or any other option, Its likely cause you have not added your github public key to our service using the profile tab</p>
+            <p>IT might also be cause the backend has not finished generating the git repo or it has not finished adding your github public key, Just wait a few minutes in that case.</p>
+        </div>
+        <% } %>
+        <% if (screen.issues == true) {%>
+        <div class="repo-issues-code">
+            <h1>Issues In Development</h1>
+        </div>
+        <% } %>
+        <% if (screen['pull-requests'] == true) {%>
+        <div class="repo-pull-requests-code">
+            <h1>Pull Requests In Development</h1>
+        </div>
+        <% } %>
+        <% if (screen.settings == true) {%>
+        <div class="repo-settings-code">
+            <h1>Settings In Development</h1>
+        </div>
+        <% } %>
+        <% if (screen.deploys == true) {%>
+        <div class="repo-deploys-code">
+            <h1>Deploy Your App</h1>
+            <p>Its As easy as pushing your code to the main repo And Pressing the deploy button below!!</p>
+            <button>Deploy</button>
+            <p>The Deploy can be run 1 time per minute, That is the rate limit on free accounts.</p>
+            <p>the app is likely going to be deployed at <%= repo.reponame+'.displicare.us' %> </p>
+            <p>You can set the Env Variable's From below, make it empty before clicking the deploy button if you want to set nothing.</p>
+            <textarea name="repo-env-commands" id="repo-env-commands" style="font-size:1.2em;" cols=70 rows="10"><%= 'Your Env, Values seperated by comma, like \nSECRETKEY=jbawfbjabfjbawobfoawb, \nPASSPORTKEY=jbawfbjabfjbawobfoawb' %></textarea>      
+            <p>The app will deploy the build script and start script, If that doesn't work, oh well, Too bad.</p>
+            <p>The app will not create a env file, instead it will put all the env variables in a command line, You cannot set port env. If you do likely something will be destroyed.</p>
+        </div>
+        <% } %>
+        <% } %>
+    </div>
+</div>
+
+<style>
+    .repo-code {
+        text-align: center;
+    }
+
+    .dashboard-repo-navbar ul {
+        list-style: none;
+        display: inline-block;
+    }
+
+    .heading-reponame-dashboard {
+        padding-left: 10px;
+        font-size: 20px;
+    }
+
+    .dashboard-repo-navbar li {
+        float: left;
+        padding-left: 40px;
+        font-size: 18px;
+    }
+
+    .dashboard-repo-navbar a {
+        position: relative;
+        background-color: transparent;
+        text-decoration: none;
+        color: #000;
+        font-size: 20px;
+    }
+
+    .dashboard-repo-navbar a:hover {
+        color: rgb(49, 46, 46);
+        text-decoration: underline;
+        text-underline-offset: 30px;
+    }
+
+    @media screen and (max-width: 950px) {
+        .dashboard-repo-navbar li {
+            padding-left: 10px;
+        }
+    }
+</style>

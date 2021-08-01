@@ -18,11 +18,28 @@
 <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-    <main>
-        <%- include('./partials/header.ejs') %>
-        <%- body %>
-        <%- include('./partials/footer.ejs') %>
-    </main>
+    <div class="wrapper">
+        <header style="width: 100%;">
+            <%- include('./partials/header.ejs') %>
+        </header>
+        <main>
+            <%- body %>
+        </main>
+        <footer>
+            <%- include('./partials/footer.ejs') %>
+        </footer>
+    </div>
 </body>
 
 </html>
+
+<style>
+    .wrapper {
+        display: block;
+        clear: both;
+    }
+
+    main {
+        padding-top: 75px;
+    }
+</style>

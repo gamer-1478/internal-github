@@ -1,21 +1,25 @@
 <div class="index-header-section">
     <img class="index-header-logo" src="/assets/logo.png" />
-    <div class="index-header-container" id="index-header-container">
+    <nav class="index-header-container" id="index-header-container">
         <ul>
-            <li><a href="#home">Home</a></li>
+            <% if(typeof loggedIn != 'undefined' && loggedIn == true && typeof username != 'undefined'){ %>
+            <li><a href=<%= "/"+username %>>Dashboard</a></li>
+            <li><a href="/deploys">Recent Deploys</a></li>
+            <li><a href=<%= "/"+username +'/profile'%>>Profile</a></li>
+            <% } else { %>
             <li><a href="/documentation">Documentation</a></li>
             <li><a href="/features">Why DisPlicare?</a></li>
             <li><a href="/pricing">Pricing</a></li>
-            <li class="float-right-mobile-header"><a href="/login">SignIn</a> </li>
-            <button class="index-header-signup-button float-right-mobile-header">SignUp</button>
-            <li class="visible-mobile-header"><a href="/signup">SignUp</a></li>
+            <li class="float-right-mobile-header"><a href="/signin">SignIn</a> </li>
+            <button class="index-header-signup-button float-right-mobile-header"
+                onclick="ChangeWindow('signup')">SignUp</button>
+            <% } %>
         </ul>
-    </div>
+    </nav>
     <img class="index-sidebar-button" onclick="openSidebar()"
         src="https://cdn0.iconfinder.com/data/icons/heroicons-ui/24/icon-menu-512.png" />
 </div>
 <style>
-    @media screen and (max-width: 8000px) {
     .index-header-signup-button {
         border: none;
         background: none;
@@ -47,7 +51,8 @@
     }
 
     .index-header-container {
-        width: 90vw;
+        width: 90%;
+        height: 10vh;
         display: inline-block;
         position: absolute;
         left: 50%;
@@ -115,7 +120,8 @@
         color: #fff;
         transition: 0.2s;
     }
-    }
+
+
     @media screen and (max-width: 950px) {
         .index-sidebar-button {
             visibility: visible;
@@ -152,5 +158,9 @@
             window.document.getElementById('index-header-container').style.display = 'none';
             locked = false
         }
+    }
+
+    function ChangeWindow(url) {
+        window.location.href = `${window.location.origin+'/'+url}`
     }
 </script>
