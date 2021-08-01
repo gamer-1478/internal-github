@@ -22,7 +22,8 @@ var expressLayouts = require('express-ejs-layouts');
 const bcrypt = require('bcrypt')
 const passport = require('passport')
 const flash = require('express-flash')
-const session = require('express-session')
+var session = require('cookie-session');
+
 const methodOverride = require('method-override')
 
 const initializePassport = require('./config/passport-config')
