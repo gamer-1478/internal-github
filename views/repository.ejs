@@ -53,7 +53,10 @@
             <p>The Deploy can be run 1 time per minute, That is the rate limit on free accounts.</p>
             <p>the app is likely going to be deployed at <%= repo.reponame+'.displicare.us' %> </p>
             <p>You can set the Env Variable's From below, make it empty before clicking the deploy button if you want to set nothing.</p>
-            <textarea name="repo-env-commands" id="repo-env-commands" style="font-size:1.2em;" cols=70 rows="10"><%= 'Your Env, Values seperated by comma, like \nSECRETKEY=jbawfbjabfjbawobfoawb, \nPASSPORTKEY=jbawfbjabfjbawobfoawb' %></textarea>      
+            <p>Your Env, Values seperated by comma, like <br>SECRETKEY=jbawfbjabfjbawobfoawb, <br>PASSPORTKEY=jbawfbjabfjbawobfoawb</p>
+            <p> You need to manually deploy to save the env values</p>
+
+            <textarea name="repo-env-commands" id="repo-env-commands" style="font-size:1.2em;" cols=70 rows="10"></textarea>
             <p>The app will deploy the build script and start script, If that doesn't work, oh well, Too bad.</p>
             <p>The app will not create a env file, instead it will put all the env variables in a command line, You cannot set port env. If you do likely something will be destroyed.</p>
         </div>

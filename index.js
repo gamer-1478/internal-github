@@ -116,7 +116,7 @@ app.get('/new-app', checkAuthenticated, (req, res) => {
 })
 
 app.post('/new-app', checkAuthenticated, (req, res) => {
-    
+
 })
 
 app.get('/deploys', checkAuthenticated, (req, res) => {
@@ -171,7 +171,7 @@ app.get('/:username?/:reponame?/:backlink?', checkAuthenticated, (req, res) => {
             loggedIn: true,
             title: "Dashboard",
             username: username,
-            repo: [{reponame:'test1'},{reponame:'test2'}]
+            repo: [{ reponame: 'test1' }, { reponame: 'test2' }]
         })
     }
     else {
@@ -200,7 +200,8 @@ app.post('/register', checkNotAuthenticated, async (req, res) => {
             if (checkIfExists.docs.length == 0) {
                 if (!checkUsername.exists) {
                     await userCollection.doc(req.body.username).set({
-                        id: Date.now().toString(),
+                        id: makeid(40),
+                        dateCreated: Date.now(),
                         name: req.body.name,
                         username: req.body.username,
                         email: req.body.email,
@@ -238,6 +239,18 @@ app.delete('/logout', (req, res) => {
 app.get('*', (req, res) => {
     res.render('404.ejs', { loggedIn: req.isAuthenticated() })
 })
+
+function makeid(length) {
+    var result = '';
+    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for (var i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() *
+            charactersLength));
+    }
+    return result;
+}
+
 
 function checkAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
