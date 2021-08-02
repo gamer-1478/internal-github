@@ -17,6 +17,7 @@ var session = require('cookie-session');
 const methodOverride = require('method-override')
 
 const initializePassport = require('./config/passport-config');
+const { json } = require('express');
 
 const userCollection = db.collection('users');
 const repoCollection = db.collection('repos');
@@ -137,6 +138,10 @@ app.post('/new-app', checkAuthenticated, async (req, res) => {
                 await portCollection.doc(nowport.toString()).set({ website: req.body.appname.toLowerCase() + "displicare.us" })
                 await userCollection.doc(req.user.username).set(currentRepo)
                 console.log("App Created Successfully, Please Wait for full deployment Which Has been Scheduled. Refresh to see status change")
+                await fetch('api.displicare.us/schedule-repo-add', {
+                    method: 'POST',
+                    body: JSON.stringify({ reponame: repo.reponame, owner: repo.owner, port: repo.port })
+                })
                 res.send({ "message": "App Created Successfully, Please Wait for full deployment Which Has been Scheduled. Refresh to see status change." })
             }
             catch (e) {
