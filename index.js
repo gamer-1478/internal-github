@@ -140,17 +140,28 @@ app.post('/new-app', checkAuthenticated, async (req, res) => {
                 currentRepo.repo.push({ reponame: repo.reponame })
                 await portCollection.doc(nowport.toString()).set({ website: req.body.appname.toLowerCase() + "displicare.us" })
                 await userCollection.doc(req.user.username).set(currentRepo)
-                console.log("App Created Successfully, Please Wait for full deployment Which Has been Scheduled. Refresh to see status change")
+                console.log(JSON.stringify({
+                    reponame: repo.reponame,
+                    owner: repo.owner,
+                    port: repo.port
+                }))
+
                 let response = await fetch('http://api.displicare.us/schedule-repo-add', {
                     method: 'POST',
-                    body: JSON.stringify({ reponame: repo.reponame, owner: repo.owner, port: repo.port })
+                    body: JSON.stringify({
+                        reponame: repo.reponame,
+                        owner: repo.owner,
+                        port: repo.port
+                    }),
+                    headers: { 'Content-Type': 'application/json' }
                 })
-                console.log(await response.json())
-                res.send({ "message": "App Created Successfully, Please Wait for full deployment Which Has been Scheduled. Refresh to see status change." })
+                let resp = await response.json()
+                console.log(await resp)
+                res.send({ "message": "App Created Successfully, Please Wait for full deployment Which Has been Scheduled. Refresh to see status change." + await resp })
             }
             catch (e) {
-                console.log(e)
-                res.status(404).send({ message: e })
+                console.log(e, "some error occured")
+                res.status(404).send({ message: "some error occured" })
             }
         }
         else {
