@@ -12,7 +12,7 @@ var expressLayouts = require('express-ejs-layouts');
 const bcrypt = require('bcrypt')
 const passport = require('passport')
 const flash = require('express-flash')
-var session = require('cookie-session');
+var session = require('express-session');
 
 const methodOverride = require('method-override')
 
@@ -197,6 +197,7 @@ app.get('/:username?/:reponame?/:backlink?', checkAuthenticated, async (req, res
     async function checkRepoNameWithLocalRepo(fn_reponame) {
         console.log(req.user.repo)
         let Ranout = await req.user.repo.every(element => {
+            console.log(element.reponame)
             if (element.hasOwnProperty('reponame') && element.reponame == fn_reponame) {
                 console.log("true")
                 return true;
