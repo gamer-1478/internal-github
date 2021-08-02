@@ -196,7 +196,7 @@ app.get('/:username?/:reponame?/:backlink?', checkAuthenticated, async (req, res
 
     async function checkRepoNameWithLocalRepo(fn_reponame) {
         console.log(req.user.repo)
-        let Ranout = await req.user.repo.every(element => {
+        let Ranout = await req.user.repo.every((element, index) => {
             console.log(element.reponame)
             if (element.hasOwnProperty('reponame') && element.reponame == fn_reponame) {
                 console.log("true")
