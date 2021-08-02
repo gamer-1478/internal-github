@@ -1,1 +1,69 @@
-<h4>Profile</h4>
+<div class="profile-section">
+    <div>
+        <div>
+            <h1>Profile</h1>
+        </div>
+        <div>
+            <h2 id="profile-name">name = <%= name %> </h2>
+        </div>
+        <div>
+            <h2 id="profile-user-name">username = <%= username %> </h2>
+        </div>
+        <div>
+            <h2 id="profile-email">email = <%= email %> </h2>
+        </div>
+        <div>
+            <h2>PUBLIC KEY (OPENSSH STANDARD GIT FORMAT ONLY!)</h2>
+        </div>
+        <div>
+            <textarea name="profile-public-key" id="profile-public-key" style="font-size:1.2em;" cols=70
+                rows="10"><%= pub_key %> </textarea>
+        </div>
+        <div>
+            <button id="public-update-button" onclick="updatePublicKey()">Update</button>
+        </div>
+        <h4 id="error"></h4>
+        <div>
+            <h3>Leave the above box empty, if you want to delete your public key</h3>
+        </div>
+        <button>SignOut</button>
+    </div>
+</div>
+<script>
+    async function updatePublicKey() {
+        let publicKey = window.document.getElementById('profile-public-key').value
+        publicKey = publicKey.replace('/\n/g', "").trim()
+        window.document.getElementById('public-update-button').style.visibility = 'visible'
+        try {
+            window.document.getElementById('public-update-button').style.visibility = 'hidden'
+            const response = await (
+                await fetch(
+                    window.location.origin + `/public-key`, {
+                        method: "POST",
+                        body: JSON.stringify({
+                            public_key: publicKey
+                        }),
+                        headers: {
+                            "Content-Type": "application/json; charset=utf-8"
+                        },
+                    }
+                )
+            ).json();
+            window.document.getElementById('error').innerHTML = response.message;
+        } catch (e) {
+            window.document.getElementById('error').innerHTML = e;
+            window.document.getElementById('public-update-button').style.visibility = 'visible'
+        }
+    }
+
+    function SignOut() {
+        //nothing
+    }
+</script>
+<style>
+    .profile-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+</style>

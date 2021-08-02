@@ -25,6 +25,7 @@ const portCollection = db.collection('ports');
 
 // Using CommonJS modules
 const fetch = require('node-fetch');
+const { use } = require('passport');
 
 
 app.use('/', express.static(path.join(__dirname, 'public')))
@@ -157,7 +158,7 @@ app.post('/new-app', checkAuthenticated, async (req, res) => {
                 })
                 let resp = await response.json()
                 console.log(await resp)
-                res.send({ "message": "App Created Successfully, Please Wait for full deployment Which Has been Scheduled. Refresh to see status change." + await resp })
+                res.send({ "message": "App Created Successfully, Please Wait for full deployment Which Has been Scheduled. Refresh to see status change." + await resp.message })
             }
             catch (e) {
                 console.log(e, "some error occured")
@@ -218,7 +219,10 @@ app.get('/:username?/:reponame?/:backlink?', checkAuthenticated, async (req, res
             res.render('profile.ejs', {
                 loggedIn: true,
                 title: "Profile",
-                username: username
+                username: username,
+                pub_key: req.user.pub_key,
+                email: req.user.email,
+                name: req.user.name
             })
         }
         else {
@@ -304,7 +308,8 @@ app.post('/register', checkNotAuthenticated, async (req, res) => {
                         username: req.body.username,
                         email: req.body.email,
                         password: hashedPassword,
-                        repo: []
+                        repo: [],
+                        pub_key: ""
                     })
                     res.send({ message: "Registeration Successful" })
                 }
@@ -329,7 +334,66 @@ app.post('/login', checkNotAuthenticated, passport.authenticate('local', {
     failureFlash: true
 }))
 
-app.delete('/logout', (req, res) => {
+app.post('/public-key', checkAuthenticated, async (req, res) => {
+    let pub_key = await req.body.public_key;
+    console.log("got triggered", pub_key.length, await req.user.pub_key.length)
+    if (pub_key.length != 0 && req.user.pub_key.length == 0) {
+        let response = await fetch('http://api.displicare.us/schedule-user-add', {
+            method: 'POST',
+            body: JSON.stringify({
+                username: req.user.username,
+                key: pub_key
+            }),
+            headers: { 'Content-Type': 'application/json' }
+        })
+        let resp = await response.json()
+
+        let FirebaseUser = await userCollection.doc(req.user.username).get()
+        FirebaseUser = FirebaseUser.data()
+        FirebaseUser.pub_key = pub_key
+        await userCollection.doc(req.user.username).set(FirebaseUser);
+        console.log(await resp)
+        res.send({ "message": "User key scheduled to be add, come back later." + resp.message })
+    }
+    else if (pub_key.length == 0 && req.user.pub_key.length != 0) {
+        let response = await fetch('http://api.displicare.us/schedule-user-delete', {
+            method: 'POST',
+            body: JSON.stringify({
+                username: req.user.username
+            }),
+            headers: { 'Content-Type': 'application/json' }
+        })
+        let resp = await response.json()
+        let FirebaseUser = await userCollection.doc(req.user.username).get()
+        FirebaseUser = FirebaseUser.data()
+        FirebaseUser.pub_key = pub_key
+        await userCollection.doc(req.user.username).set(FirebaseUser);
+        console.log(await resp)
+        res.send({ "message": "User key scheduled to be DELETED, come back later." + resp.message })
+    }
+    else if (pub_key.length != 0 && req.user.pub_key.length != 0) {
+        let response = await fetch('http://api.displicare.us/schedule-user-change', {
+            method: 'POST',
+            body: JSON.stringify({
+                username: req.user.username,
+                key: pub_key
+            }),
+            headers: { 'Content-Type': 'application/json' }
+        })
+        let resp = await response.json()
+        let FirebaseUser = await userCollection.doc(req.user.username).get()
+        FirebaseUser = FirebaseUser.data()
+        FirebaseUser.pub_key = pub_key
+        await userCollection.doc(req.user.username).set(FirebaseUser);
+        console.log(await resp)
+        res.send({ "message": "User key scheduled to be DELETED, come back later." + resp.message })
+    }
+    else{
+        res.send({"message":"this was really not supposed to happen"})
+    }
+})
+
+app.delete('/logout', checkAuthenticated, (req, res) => {
     req.logOut()
     res.redirect('/signin')
 })
