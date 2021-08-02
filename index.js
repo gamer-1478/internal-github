@@ -108,7 +108,8 @@ app.get('/new-app', checkAuthenticated, (req, res) => {
 })
 
 app.post('/new-app', checkAuthenticated, async (req, res) => {
-    if (req.body.hasOwnProperty('appname') && req.body.appname != 0) {
+    let checkIfExists = await repoCollection.doc(req.body.appname).get();
+    if (req.body.hasOwnProperty('appname') && req.body.appname != 0 && !checkIfExists.exists) {
         let repo = {
             "reponame": req.body.appname || '',
             "port": 0,
@@ -125,14 +126,19 @@ app.post('/new-app', checkAuthenticated, async (req, res) => {
             await repoCollection.doc(repo.reponame).set(repo)
             let currentRepo = await userCollection.doc(req.user.username).get()
             currentRepo = currentRepo.data()
-            currentRepo.repo = currentRepo.repo.push({ reponame: repo.reponame })
+            console.log(currentRepo)
+            currentRepo.repo.push({ reponame: repo.reponame })
             await userCollection.doc(req.user.username).set(currentRepo)
+            console.log("App Created Successfully, Please Wait for full deployment Which Has been Scheduled. Refresh to see status change")
             res.send({ "message": "App Created Successfully, Please Wait for full deployment Which Has been Scheduled. Refresh to see status change." })
         }
         catch (e) {
             console.log(e)
             res.status(404).send({ message: e })
         }
+    }
+    else {
+        console.log(checkIfExists.exists)
     }
 })
 
@@ -164,7 +170,7 @@ app.get('/:username?/:reponame?/:backlink?', checkAuthenticated, async (req, res
         if (await Ranout != true) {
             return false;
         }
-        else{
+        else {
             return true;
         }
     }
@@ -178,10 +184,8 @@ app.get('/:username?/:reponame?/:backlink?', checkAuthenticated, async (req, res
             })
         }
         else {
-
-            console.log(req.user.repo, await checkRepoNameWithLocalRepo(reponame))
             if (await checkRepoNameWithLocalRepo(reponame) == true) {
-                let repo_details = await repoCollection.doc(req.user.repo).get()
+                let repo_details = await repoCollection.doc(reponame).get()
                 repo_details = repo_details.data()
                 switch (backlink) {
                     case 'issues':

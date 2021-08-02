@@ -8,7 +8,7 @@
                 <input type="submit" value="Create App" class="newapp-index-submit" id="newapp-index-submit">
             </form>
         </div>
-        <h4 id="error"></h4>
+        <h4 class="error1" id="error1"></h4>
     </div>
 </div>
 
@@ -21,8 +21,32 @@
 </style>
 
 <script>
-    function newApp() {
+
+    async function newApp() {
         let reponame = document.getElementById('newapp-index-appname').value
-        if(reponame == ''){}
+        if (reponame == '') {
+            document.getElementById('error1').innerHTML = `Reponame can't be empty`;
+        } else {
+            document.getElementById('error1').innerHTML = ``;
+            console.log("fetching stuff")
+            try {
+                const response = await (
+                    await fetch(
+                        window.location.origin + `/new-app`, {
+                            method: "POST",
+                            body: JSON.stringify({
+                                appname: reponame
+                            }),
+                            headers: {
+                                "Content-Type": "application/json; charset=utf-8"
+                            },
+                        }
+                    )
+                ).json();
+                window.document.getElementById('error1').innerHTML = response.message || response.error;
+            } catch (e) {
+                window.document.getElementById('error1').innerHTML = e;
+            }
+        }
     }
 </script>
