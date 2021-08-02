@@ -23,6 +23,9 @@ const userCollection = db.collection('users');
 const repoCollection = db.collection('repos');
 const portCollection = db.collection('ports');
 
+// Using CommonJS modules
+const fetch = require('cross-fetch');
+
 
 app.use('/', express.static(path.join(__dirname, 'public')))
 app.use(express.json());
