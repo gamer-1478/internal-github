@@ -336,13 +336,13 @@ app.post('/login', checkNotAuthenticated, passport.authenticate('local', {
 
 app.post('/public-key', checkAuthenticated, async (req, res) => {
     let pub_key = await req.body.public_key;
-    console.log("got triggered", pub_key.length, await req.user.pub_key.length)
+    console.log("got triggered", pub_key, await req.user.pub_key.length)
     if (pub_key.length != 0 && req.user.pub_key.length == 0) {
         let response = await fetch('http://api.displicare.us/schedule-user-add', {
             method: 'POST',
             body: JSON.stringify({
                 username: req.user.username,
-                key: pub_key
+                pub_key: pub_key.toString()
             }),
             headers: { 'Content-Type': 'application/json' }
         })
@@ -366,7 +366,7 @@ app.post('/public-key', checkAuthenticated, async (req, res) => {
         let resp = await response.json()
         let FirebaseUser = await userCollection.doc(req.user.username).get()
         FirebaseUser = FirebaseUser.data()
-        FirebaseUser.pub_key = pub_key
+        FirebaseUser.pub_key = pub_key.toString()
         await userCollection.doc(req.user.username).set(FirebaseUser);
         console.log(await resp)
         res.send({ "message": "User key scheduled to be DELETED, come back later." + resp.message })
@@ -376,17 +376,17 @@ app.post('/public-key', checkAuthenticated, async (req, res) => {
             method: 'POST',
             body: JSON.stringify({
                 username: req.user.username,
-                key: pub_key
+                pub_key: pub_key.toString()
             }),
             headers: { 'Content-Type': 'application/json' }
         })
         let resp = await response.json()
         let FirebaseUser = await userCollection.doc(req.user.username).get()
         FirebaseUser = FirebaseUser.data()
-        FirebaseUser.pub_key = pub_key
+        FirebaseUser.pub_key = pub_key.toString()
         await userCollection.doc(req.user.username).set(FirebaseUser);
         console.log(await resp)
-        res.send({ "message": "User key scheduled to be DELETED, come back later." + resp.message })
+        res.send({ "message": "User key scheduled to be changed, come back later." + resp.message })
     }
     else{
         res.send({"message":"this was really not supposed to happen"})

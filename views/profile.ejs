@@ -32,7 +32,8 @@
 <script>
     async function updatePublicKey() {
         let publicKey = window.document.getElementById('profile-public-key').value
-        publicKey = publicKey.replace('/\n/g', "").trim()
+        publicKey = publicKey.replace('/\n/g', "")
+        publicKey = publicKey.trim()
         window.document.getElementById('public-update-button').style.visibility = 'visible'
         try {
             window.document.getElementById('public-update-button').style.visibility = 'hidden'
