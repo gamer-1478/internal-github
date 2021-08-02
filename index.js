@@ -144,8 +144,8 @@ app.post('/new-app', checkAuthenticated, async (req, res) => {
                 let response = await fetch('http://api.displicare.us/schedule-repo-add', {
                     method: 'POST',
                     body: JSON.stringify({ reponame: repo.reponame, owner: repo.owner, port: repo.port })
-                }).json()
-                console.log(await response)
+                })
+                console.log(await response.json())
                 res.send({ "message": "App Created Successfully, Please Wait for full deployment Which Has been Scheduled. Refresh to see status change." })
             }
             catch (e) {
