@@ -24,12 +24,17 @@
 
     async function newApp() {
         let reponame = document.getElementById('newapp-index-appname').value
+        document.getElementById('newapp-index-submit').style.visibility = 'visible'
+
         if (reponame == '') {
+            document.getElementById('newapp-index-submit').style.visibility = 'visible'
             document.getElementById('error1').innerHTML = `Reponame can't be empty`;
         } else {
             document.getElementById('error1').innerHTML = ``;
             console.log("fetching stuff")
             try {
+                document.getElementById('newapp-index-submit').style.visibility = 'hidden'
+                document.getElementById('error1').innerHTML = `PLEASE WAIT LOADING....`;
                 const response = await (
                     await fetch(
                         window.location.origin + `/new-app`, {
@@ -46,6 +51,7 @@
                 window.document.getElementById('error1').innerHTML = response.message || response.error;
             } catch (e) {
                 window.document.getElementById('error1').innerHTML = e;
+                document.getElementById('newapp-index-submit').style.visibility = 'visible'
             }
         }
     }
