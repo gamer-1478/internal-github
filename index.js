@@ -20,6 +20,7 @@ const initializePassport = require('./config/passport-config');
 
 const userCollection = db.collection('users');
 const repoCollection = db.collection('repos');
+const portCollection = db.collection('ports');
 
 
 app.use('/', express.static(path.join(__dirname, 'public')))
@@ -108,38 +109,50 @@ app.get('/new-app', checkAuthenticated, (req, res) => {
 })
 
 app.post('/new-app', checkAuthenticated, async (req, res) => {
-    let checkIfExists = await repoCollection.doc(req.body.appname).get();
-    if (req.body.hasOwnProperty('appname') && req.body.appname != 0 && !checkIfExists.exists) {
-        let repo = {
-            "reponame": req.body.appname || '',
-            "port": 0,
-            "owner": req.user.username,
-            "access": [req.user.username],
-            "env-var": "",
-            "deploy_error": "",
-            "deploying": true,
-            "deploy-completed": false,
-            "last-deploy": Date.now(),
-            "date-created": Date.now()
+    let checkIfExists = await repoCollection.doc(req.body.appname.toLowerCase()).get();
+    let port = await portCollection.get()
+    port = port.docs[port.docs.length - 1].id
+    let nowport = parseInt(port) + 1
+
+    if (req.body.hasOwnProperty('appname') && req.body.appname.toLowerCase() != 0 && !checkIfExists.exists) {
+        if (req.body.appname.toLowerCase() !== 'profile') {
+            let repo = {
+                "reponame": req.body.appname.toLowerCase() || '',
+                "port": nowport,
+                "owner": req.user.username,
+                "access": [req.user.username],
+                "env-var": "",
+                "deploy_error": "",
+                "deploying": true,
+                "deploy-completed": false,
+                "last-deploy": Date.now(),
+                "date-created": Date.now()
+            }
+            nowport = parseInt(nowport)
+            try {
+                await repoCollection.doc(repo.reponame).set(repo)
+                let currentRepo = await userCollection.doc(req.user.username).get()
+                currentRepo = currentRepo.data()
+                currentRepo.repo.push({ reponame: repo.reponame })
+                await portCollection.doc(nowport.toString()).set({ website: req.body.appname.toLowerCase() + "displicare.us" })
+                await userCollection.doc(req.user.username).set(currentRepo)
+                console.log("App Created Successfully, Please Wait for full deployment Which Has been Scheduled. Refresh to see status change")
+                res.send({ "message": "App Created Successfully, Please Wait for full deployment Which Has been Scheduled. Refresh to see status change." })
+            }
+            catch (e) {
+                console.log(e)
+                res.status(404).send({ message: e })
+            }
         }
-        try {
-            await repoCollection.doc(repo.reponame).set(repo)
-            let currentRepo = await userCollection.doc(req.user.username).get()
-            currentRepo = currentRepo.data()
-            console.log(currentRepo)
-            currentRepo.repo.push({ reponame: repo.reponame })
-            await userCollection.doc(req.user.username).set(currentRepo)
-            console.log("App Created Successfully, Please Wait for full deployment Which Has been Scheduled. Refresh to see status change")
-            res.send({ "message": "App Created Successfully, Please Wait for full deployment Which Has been Scheduled. Refresh to see status change." })
-        }
-        catch (e) {
-            console.log(e)
-            res.status(404).send({ message: e })
+        else {
+            res.send({ "message": "PROFILE IS A RESTRICTED KEYWORD, PLEASE CHOSE ANOTHER NAME!!!!!!!!!" })
+
         }
     }
     else {
-        console.log(checkIfExists.exists)
+        res.send({ "message": "App with same name already exists, please chose another name." })
     }
+
 })
 
 app.get('/deploys', checkAuthenticated, (req, res) => {
@@ -310,7 +323,6 @@ function makeid(length) {
     }
     return result;
 }
-
 
 function checkAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
