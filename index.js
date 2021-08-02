@@ -144,7 +144,9 @@ app.post('/new-app', checkAuthenticated, async (req, res) => {
                 await fetch('http://api.displicare.us/schedule-repo-add', {
                     method: 'POST',
                     body: JSON.stringify({ reponame: repo.reponame, owner: repo.owner, port: repo.port })
-                })
+                }).then(function(response) {
+                    console.log(response.message)
+                });
                 res.send({ "message": "App Created Successfully, Please Wait for full deployment Which Has been Scheduled. Refresh to see status change." })
             }
             catch (e) {
@@ -183,6 +185,7 @@ app.get('/:username?/:reponame?/:backlink?', checkAuthenticated, async (req, res
     let deploys = false;
 
     async function checkRepoNameWithLocalRepo(fn_reponame) {
+        console.log(req.user.repo)
         let Ranout = await req.user.repo.every(element => {
             if (element.hasOwnProperty('reponame') && element.reponame == fn_reponame) {
                 return true;
