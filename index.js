@@ -204,7 +204,7 @@ app.post('/deploy', checkAuthenticated, async (req, res) => {
         let response = await fetch('http://api.displicare.us/schedule-repo-deploy', {
             method: 'POST',
             body: JSON.stringify({
-                reponame: repo.reponame
+                reponame: deploy_reponame
             }),
             headers: { 'Content-Type': 'application/json' }
         })
