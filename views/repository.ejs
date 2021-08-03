@@ -24,10 +24,14 @@
             <h1>Code Viewing And Editing In Development</h1>
             <p>MeanWhile add remote using 'git remote add displicare git@git.displicare.us:<%= repo.reponame %>' </p>
             <p>add the code using 'git add .'</p>
-            <p>Push the code using 'git push displicare main' and commit the code before that using 'git commit -m "first commit"'</p>
-            <p>Please note the displicare service will only deploy whatever is on main repo. All other repo's can be pushed, but won't be deployed.</p>
-            <p>If you are unable to perform push or any other option, Its likely cause you have not added your github public key to our service using the profile tab</p>
-            <p>IT might also be cause the backend has not finished generating the git repo or it has not finished adding your github public key, Just wait a few minutes in that case.</p>
+            <p>Push the code using 'git push displicare main' and commit the code before that using 'git commit -m
+                "first commit"'</p>
+            <p>Please note the displicare service will only deploy whatever is on main repo. All other repo's can be
+                pushed, but won't be deployed.</p>
+            <p>If you are unable to perform push or any other option, Its likely cause you have not added your github
+                public key to our service using the profile tab</p>
+            <p>IT might also be cause the backend has not finished generating the git repo or it has not finished adding
+                your github public key, Just wait a few minutes in that case.</p>
         </div>
         <% } %>
         <% if (screen.issues == true) {%>
@@ -49,21 +53,54 @@
         <div class="repo-deploys-code">
             <h1>Deploy Your App</h1>
             <p>Its As easy as pushing your code to the main repo And Pressing the deploy button below!!</p>
-            <button>Deploy</button>
+            <button id="deploy-button" onclick="deploy()">Deploy</button>
+            <h4 id="error"></h4>
             <p>The Deploy can be run 1 time per minute, That is the rate limit on free accounts.</p>
             <p>the app is likely going to be deployed at <%= repo.reponame+'.displicare.us' %> </p>
-            <p>You can set the Env Variable's From below, make it empty before clicking the deploy button if you want to set nothing.</p>
-            <p>Your Env, Values seperated by comma, like <br>SECRETKEY=jbawfbjabfjbawobfoawb, <br>PASSPORTKEY=jbawfbjabfjbawobfoawb</p>
+            <p>You can set the Env Variable's From below, make it empty before clicking the deploy button if you want to
+                set nothing.</p>
+            <p>Your Env, Values seperated by comma, like <br>SECRETKEY=jbawfbjabfjbawobfoawb,
+                <br>PASSPORTKEY=jbawfbjabfjbawobfoawb</p>
             <p> You need to manually deploy to save the env values</p>
-
-            <textarea name="repo-env-commands" id="repo-env-commands" style="font-size:1.2em;" cols=70 rows="10"></textarea>
+            <textarea name="repo-env-commands" id="repo-env-commands" style="font-size:1.2em;" cols=70
+                rows="10"><%= repo.env %> </textarea>
             <p>The app will deploy the build script and start script, If that doesn't work, oh well, Too bad.</p>
-            <p>The app will not create a env file, instead it will put all the env variables in a command line, You cannot set port env. If you do likely something will be destroyed.</p>
+            <p>The app will not create a env file, instead it will put all the env variables in a command line, You
+                cannot set port env. If you do likely something will be destroyed.</p>
         </div>
         <% } %>
         <% } %>
     </div>
 </div>
+
+<script>
+    async function deploy() {
+        let env_vars = window.document.getElementById('repo-env-commands').value
+        let reponame = "<%= repo.reponame %>"
+        try {
+            window.document.getElementById('deploy-button').style.visibility = 'invisible'
+            document.getElementById('error').innerHTML = `PLEASE WAIT DEPLOYING....`;
+            const response = await (
+                await fetch(
+                    window.location.origin + `/deploy`, {
+                        method: "POST",
+                        body: JSON.stringify({
+                            reponame: reponame,
+                            env_vars: env_vars
+                        }),
+                        headers: {
+                            "Content-Type": "application/json; charset=utf-8"
+                        },
+                    }
+                )
+            ).json();
+            window.document.getElementById('error').innerHTML = response.message || response.error;
+
+        } catch (e) {
+            window.document.getElementById('error').innerHTML = e
+        }
+    }
+</script>
 
 <style>
     .repo-code {

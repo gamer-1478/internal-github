@@ -26,7 +26,7 @@
         <div>
             <h3>Leave the above box empty, if you want to delete your public key</h3>
         </div>
-        <button>SignOut</button>
+        <button onclick="SignOut()">SignOut</button>
     </div>
 </div>
 <script>
@@ -57,8 +57,15 @@
         }
     }
 
-    function SignOut() {
-        //nothing
+    async function SignOut() {
+        await fetch(
+            window.location.origin + `/logout`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json; charset=utf-8"
+                },
+            }
+        )
     }
 </script>
 <style>

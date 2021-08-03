@@ -119,61 +119,66 @@ app.post('/new-app', checkAuthenticated, async (req, res) => {
     port = port.docs[port.docs.length - 1].id
     let nowport = parseInt(port) + 1
 
-    if (req.body.hasOwnProperty('appname') && req.body.appname.toLowerCase() != 0 && !checkIfExists.exists) {
-        if (req.body.appname.toLowerCase() !== 'profile') {
-            let repo = {
-                "reponame": req.body.appname.toLowerCase() || '',
-                "port": nowport,
-                "owner": req.user.username,
-                "access": [req.user.username],
-                "env-var": "",
-                "deploy_error": "",
-                "deploying": true,
-                "deploy-completed": false,
-                "last-deploy": Date.now(),
-                "date-created": Date.now()
-            }
-            nowport = parseInt(nowport)
-            try {
-                await repoCollection.doc(repo.reponame).set(repo)
-                let currentRepo = await userCollection.doc(req.user.username).get()
-                currentRepo = currentRepo.data()
-                currentRepo.repo.push({ reponame: repo.reponame })
-                await portCollection.doc(nowport.toString()).set({ website: req.body.appname.toLowerCase() + "displicare.us" })
-                await userCollection.doc(req.user.username).set(currentRepo)
-                console.log(JSON.stringify({
-                    reponame: repo.reponame,
-                    owner: repo.owner,
-                    port: repo.port
-                }))
-
-                let response = await fetch('http://api.displicare.us/schedule-repo-add', {
-                    method: 'POST',
-                    body: JSON.stringify({
+    if (req.body.free_apps_left != 0) {
+        if (req.body.hasOwnProperty('appname') && req.body.appname.toLowerCase() != 0 && !checkIfExists.exists) {
+            if (req.body.appname.toLowerCase() !== 'profile') {
+                let repo = {
+                    "reponame": req.body.appname.toLowerCase() || '',
+                    "port": nowport,
+                    "owner": req.user.username,
+                    "access": [req.user.username],
+                    "env-var": "",
+                    "deploy_error": "",
+                    "deploying": true,
+                    "deploy-completed": false,
+                    "last-deploy": Date.now(),
+                    "date-created": Date.now()
+                }
+                nowport = parseInt(nowport)
+                try {
+                    await repoCollection.doc(repo.reponame).set(repo)
+                    let currentRepo = await userCollection.doc(req.user.username).get()
+                    currentRepo = currentRepo.data()
+                    currentRepo.repo.push({ reponame: repo.reponame })
+                    currentRepo.free_apps_left = currentRepo.free_apps_left - 1
+                    await portCollection.doc(nowport.toString()).set({ website: req.body.appname.toLowerCase() + "displicare.us" })
+                    await userCollection.doc(req.user.username).set(currentRepo)
+                    console.log(JSON.stringify({
                         reponame: repo.reponame,
                         owner: repo.owner,
                         port: repo.port
-                    }),
-                    headers: { 'Content-Type': 'application/json' }
-                })
-                let resp = await response.json()
-                console.log(await resp)
-                res.send({ "message": "App Created Successfully, Please Wait for full deployment Which Has been Scheduled. Refresh to see status change." + await resp.message })
+                    }))
+
+                    let response = await fetch('http://api.displicare.us/schedule-repo-add', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            reponame: repo.reponame,
+                            owner: repo.owner,
+                            port: repo.port
+                        }),
+                        headers: { 'Content-Type': 'application/json' }
+                    })
+                    let resp = await response.json()
+                    console.log(await resp)
+                    res.send({ "message": "App Created Successfully, Please Wait for full deployment Which Has been Scheduled. Refresh to see status change." + await resp.message })
+                }
+                catch (e) {
+                    console.log(e, "some error occured")
+                    res.status(404).send({ message: "some error occured" })
+                }
             }
-            catch (e) {
-                console.log(e, "some error occured")
-                res.status(404).send({ message: "some error occured" })
+            else {
+                res.send({ "message": "PROFILE IS A RESTRICTED KEYWORD, PLEASE CHOSE ANOTHER NAME!!!!!!!!!" })
+
             }
         }
         else {
-            res.send({ "message": "PROFILE IS A RESTRICTED KEYWORD, PLEASE CHOSE ANOTHER NAME!!!!!!!!!" })
-
+            res.send({ "message": "App with same name already exists, please chose another name." })
         }
     }
     else {
-        res.send({ "message": "App with same name already exists, please chose another name." })
+        res.send({ "message": "Free accounts get only 2 git apps, Please Delete one of your apps to create more." })
     }
-
 })
 
 app.get('/deploys', checkAuthenticated, (req, res) => {
@@ -182,6 +187,35 @@ app.get('/deploys', checkAuthenticated, (req, res) => {
         title: "index",
         username: req.user.username
     })
+})
+
+app.post('/deploy', checkAuthenticated, async (req, res) => {
+    let deploy_reponame = req.body.reponame
+    let env_vars = req.body.env_vars
+
+    let repoData = await repoCollection.doc(deploy_reponame).get()
+    repoData = repoData.data()
+    console.log(repoData.hasOwnProperty('last-deploy'), ((parseInt(repoData['last-deploy']) / 1000) + 60) < (Date.now() / 1000))
+    if (repoData.hasOwnProperty('last-deploy') && ((parseInt(repoData['last-deploy']) / 1000) + 60) < (Date.now() / 1000)) {
+        repoData['last-deploy'] = Date.now()
+        repoData['env-var'] = env_vars;
+        await repoCollection.doc(deploy_reponame).set(repoData);
+        console.log("deploying scheduled")
+        let response = await fetch('http://api.displicare.us/schedule-repo-deploy', {
+            method: 'POST',
+            body: JSON.stringify({
+                reponame: repo.reponame
+            }),
+            headers: { 'Content-Type': 'application/json' }
+        })
+        let resp = await response.json()
+        console.log(await resp)
+        res.send({ "message": "Deployment sheduled Successfully, Please Wait for full deployment Which Has been Scheduled. Refresh On your domain to see your app live.." + await resp.message })
+    }
+    else {
+        console.log("repo doesn't exist, or you have deployed just in the last minute. Cannot deploy again due to ratelimit.")
+        res.send({ message: "repo doesn't exist, or you have deployed just in the last minute. Cannot deploy again due to ratelimit." })
+    }
 })
 
 app.get('/:username?/:reponame?/:backlink?', checkAuthenticated, async (req, res) => {
@@ -309,7 +343,8 @@ app.post('/register', checkNotAuthenticated, async (req, res) => {
                         email: req.body.email,
                         password: hashedPassword,
                         repo: [],
-                        pub_key: ""
+                        pub_key: "",
+                        free_apps_left: 2
                     })
                     res.send({ message: "Registeration Successful" })
                 }
@@ -388,8 +423,8 @@ app.post('/public-key', checkAuthenticated, async (req, res) => {
         console.log(await resp)
         res.send({ "message": "User key scheduled to be changed, come back later." + resp.message })
     }
-    else{
-        res.send({"message":"this was really not supposed to happen"})
+    else {
+        res.send({ "message": "this was really not supposed to happen" })
     }
 })
 
