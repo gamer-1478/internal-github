@@ -56,6 +56,7 @@ initializePassport(
 
 app.use(flash())
 app.use(session({
+    name:'_displicareAuth',
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false

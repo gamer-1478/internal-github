@@ -11,9 +11,12 @@ function DeleteRepo(email, reponame) {
 }
 
 function ForgotPassword(email) {
-
+    if (!email.isEmpty()){
+        
+    }
 }
 
 function VerifyEmail(email) {
+    
 
 }
