@@ -27,7 +27,6 @@ const portCollection = db.collection('ports');
 const fetch = require('node-fetch');
 const { use } = require('passport');
 
-
 app.use('/', express.static(path.join(__dirname, 'public')))
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -73,9 +72,9 @@ app.get('/signin', checkNotAuthenticated, async (req, res) => {
     res.render('signin.ejs', { loggedIn: false, title: "SignIn" })
 })
 
-app.get('/signup', checkNotAuthenticated, async (req, res) => {
-    res.render('signup.ejs', { loggedIn: false, title: "SignUp" })
-})
+// app.get('/signup', checkNotAuthenticated, async (req, res) => {
+//     res.render('signup.ejs', { loggedIn: false, title: "SignUp" })
+// })
 
 //documentation
 app.get('/documentation', async (req, res) => {
@@ -321,48 +320,47 @@ app.get('/:username?/:reponame?/:backlink?', checkAuthenticated, async (req, res
 })
 
 //signup post
-app.post('/register', checkNotAuthenticated, async (req, res) => {
-    if (!validateEmail(req.body.email)) {
-        res.send({ message: "Email Is not valid" })
-    }
-    else if (req.body.password.length < 6) {
-        res.send({ message: "Password Is less than 6 letters." })
-    }
-    else {
-        try {
-            const hashedPassword = await bcrypt.hash(req.body.password, 10)
-            var checkIfExists = await userCollection.where('email', '==', req.body.email).get();
-            var checkUsername = await userCollection.doc(req.body.username).get()
+// app.post('/register', checkNotAuthenticated, async (req, res) => {
+//     if (!validateEmail(req.body.email)) {
+//         res.send({ message: "Email Is not valid" })
+//     }
+//     else if (req.body.password.length < 6) {
+//         res.send({ message: "Password Is less than 6 letters." })
+//     }
+//     else {
+//         try {
+//             const hashedPassword = await bcrypt.hash(req.body.password, 10)
+//             var checkIfExists = await userCollection.where('email', '==', req.body.email).get();
+//             var checkUsername = await userCollection.doc(req.body.username).get()
 
-            if (checkIfExists.docs.length == 0) {
-                if (!checkUsername.exists) {
-                    await userCollection.doc(req.body.username).set({
-                        id: makeid(40),
-                        dateCreated: Date.now(),
-                        name: req.body.name,
-                        username: req.body.username,
-                        email: req.body.email,
-                        password: hashedPassword,
-                        repo: [],
-                        pub_key: "",
-                        free_apps_left: 2
-                    })
-                    res.send({ message: "Registeration Successful" })
-                }
-                else {
-                    res.send({ message: "account with same username already exists, please take another username" })
-                }
-            }
-            else {
-                res.send({ message: "account with same email already exists, please enter another email" })
-            }
-        } catch (e) {
-            console.log(e)
-            res.send({ message: "Registeration Failure" })
-        }
-    }
-
-})
+//             if (checkIfExists.docs.length == 0) {
+//                 if (!checkUsername.exists) {
+//                     await userCollection.doc(req.body.username).set({
+//                         id: makeid(40),
+//                         dateCreated: Date.now(),
+//                         name: req.body.name,
+//                         username: req.body.username,
+//                         email: req.body.email,
+//                         password: hashedPassword,
+//                         repo: [],
+//                         pub_key: "",
+//                         free_apps_left: 2
+//                     })
+//                     res.send({ message: "Registeration Successful" })
+//                 }
+//                 else {
+//                     res.send({ message: "account with same username already exists, please take another username" })
+//                 }
+//             }
+//             else {
+//                 res.send({ message: "account with same email already exists, please enter another email" })
+//             }
+//         } catch (e) {
+//             console.log(e)
+//             res.send({ message: "Registeration Failure" })
+//         }
+//     }
+// })
 
 app.post('/login', checkNotAuthenticated, passport.authenticate('local', {
     successRedirect: '/',
