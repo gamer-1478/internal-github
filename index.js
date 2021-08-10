@@ -72,9 +72,9 @@ app.get('/signin', checkNotAuthenticated, async (req, res) => {
     res.render('signin.ejs', { loggedIn: false, title: "SignIn" })
 })
 
-// app.get('/signup', checkNotAuthenticated, async (req, res) => {
-//     res.render('signup.ejs', { loggedIn: false, title: "SignUp" })
-// })
+app.get('/signup', checkNotAuthenticated, async (req, res) => {
+    res.render('signup.ejs', { loggedIn: false, title: "SignUp" })
+})
 
 //documentation
 app.get('/documentation', async (req, res) => {
